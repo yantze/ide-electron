@@ -65,6 +65,7 @@ function rebuildModule(modulePath, type, version) {
       HOME: target === 'electron' ? '~/.electron-gyp' : undefined
     });
     removeSync(cache);
+    console.log('ls cwd >>>', execSync(`ls ${join(modulePath, "build")}`).toString());
     copySync(join(modulePath, 'build'), cache);
   }
 }
