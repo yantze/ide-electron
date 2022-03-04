@@ -26,7 +26,6 @@ jobs:
         run: |
           npm i --ignore-scripts
           npm run rebuild-native
-          npm run pack
         env:
           TARGET_PLATFORMS: win32
 
@@ -37,4 +36,3 @@ jobs:
             LICENSE
             out/*.dmg
             out/*.exe
-          if-no-files-found: error
