@@ -58,8 +58,8 @@ function rebuildModule(modulePath, type, version) {
     const command = commands.join(' ');
     console.log(command);
     console.log('cwd >>>', modulePath);
-    console.log('ls cwd >>>', execSync(`ls ${modulePath}`));
-    console.log('current cwd >>>', execSync(`ls ${__dirname}`));
+    console.log('ls cwd >>>', execSync(`ls ${modulePath}`).toString());
+    console.log('current cwd >>>', execSync(`ls ${__dirname}`).toString());
     execSync(command, {
       cwd: modulePath,
       HOME: target === 'electron' ? '~/.electron-gyp' : undefined
