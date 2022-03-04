@@ -7,18 +7,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
-    name: Publish for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  windows-build:
+    runs-on: windows-latest
 
     strategy:
       matrix:
         node_version: [14.x]
-        os:
-          - windows-latest
-        include:
-          - os: windows-latest
-            TARGET_PLATFORMS: win32
 
     steps:
       - uses: actions/checkout@v2
@@ -30,17 +24,8 @@ jobs:
 
       - name: Package Electron
         run: |
-          npm install -g node-gyp
-          set npm_config_node_gyp=%USERPROFILE%\AppData\Roaming\npm\node_modules\node-gyp\bin\node-gyp.js
           npm i
           npm run rebuild-native
           npm run pack
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Release
-          path: |
-            LICENSE
-            out/*.dmg
-            out/*.exe
-          if-no-files-found: error
+        env:
+          TARGET_PLATFORMS: win32
