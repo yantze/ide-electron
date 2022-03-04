@@ -57,9 +57,6 @@ function rebuildModule(modulePath, type, version) {
   else {
     const command = commands.join(' ');
     console.log(command);
-    console.log('cwd >>>', modulePath);
-    console.log('ls cwd >>>', execSync(`ls ${modulePath}`).toString());
-    console.log('current cwd >>>', execSync(`ls ${__dirname}`).toString());
     execSync(command, {
       cwd: modulePath,
       HOME: target === 'electron' ? '~/.electron-gyp' : undefined
@@ -73,7 +70,6 @@ function getBuildCacheDir(modulePath, type, version, target) {
   const info = require(join(modulePath, './package.json'));
   return join(require('os').tmpdir(), 'ide_build_cache', target, info.name + '-' + info.version, type + '-' + version);
 }
-
 
 nativeModules.forEach(path => {
   rebuildModule(path, target, version);
