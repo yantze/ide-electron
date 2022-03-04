@@ -7,8 +7,9 @@ const argv = require('yargs').argv;
 const nativeModules = [
   resolve(__dirname, '../node_modules/node-pty'),
   resolve(__dirname, '../node_modules/nsfw'),
-  resolve(__dirname, '../node_modules/spdlog')
-]
+  resolve(__dirname, '../node_modules/spdlog'),
+  resolve(__dirname, '../node_modules/keytar'),
+];
 
 let commands;
 
