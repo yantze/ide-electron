@@ -1,13 +1,13 @@
 const os = require('os');
-const { join } = require('path');
+const { resolve } = require('path');
 const { execSync } = require('child_process');
 const { pathExistsSync, copySync, removeSync } = require('fs-extra');
 const argv = require('yargs').argv;
 
 const nativeModules = [
-  join(__dirname, '../node_modules/node-pty'),
-  join(__dirname, '../node_modules/nsfw'),
-  join(__dirname, '../node_modules/spdlog')
+  resolve(__dirname, '../node_modules/node-pty'),
+  resolve(__dirname, '../node_modules/nsfw'),
+  resolve(__dirname, '../node_modules/spdlog')
 ]
 
 let commands;
@@ -25,14 +25,14 @@ if (target === 'electron') {
   if (os.platform() === 'win32') {
     commands = [
       'set HOME=~/.electron-gyp',
-      join(__dirname, '..\\node_modules\\.bin\\electron-rebuild.cmd'),
+      resolve(__dirname, '..\\node_modules\\.bin\\electron-rebuild.cmd'),
     ];
   } else {
     commands = [
       `npm_config_arch=${arch}`,
       `npm_config_target_arch=${arch}`,
       'HOME=~/.electron-gyp',
-      join(__dirname, '../node_modules/.bin/electron-rebuild'),
+      resolve(__dirname, '../node_modules/.bin/electron-rebuild'),
     ];
   }
 } else if (target === 'node') {
@@ -46,28 +46,28 @@ if (target === 'electron') {
 }
 
 function rebuildModule(modulePath, type, version) {
-  const info = require(join(modulePath, './package.json'));
+  const info = require(resolve(modulePath, './package.json'));
   console.log('rebuilding ' + info.name)
   const cache = getBuildCacheDir(modulePath, type, version, target);
   if (pathExistsSync(cache) && !argv['force-rebuild']) {
     console.log('cache found for ' + info.name)
-    copySync(cache, join(modulePath, 'build'));
+    copySync(cache, resolve(modulePath, 'build'));
   }
   else {
-    const command = commands.join(' ');
+    const command = commands.resolve(' ');
     console.log(command);
     execSync(command, {
       cwd: modulePath,
       HOME: target === 'electron' ? '~/.electron-gyp' : undefined
     });
     removeSync(cache);
-    copySync(join(modulePath, 'build'), cache);
+    copySync(resolve(modulePath, 'build'), cache);
   }
 }
 
 function getBuildCacheDir(modulePath, type, version, target) {
-  const info = require(join(modulePath, './package.json'));
-  return join(require('os').tmpdir(), 'ide_build_cache', target, info.name + '-' + info.version, type + '-' + version);
+  const info = require(resolve(modulePath, './package.json'));
+  return resolve(require('os').tmpdir(), 'ide_build_cache', target, info.name + '-' + info.version, type + '-' + version);
 }
 
 
