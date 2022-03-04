@@ -15,13 +15,10 @@ jobs:
       matrix:
         node_version: [14.x]
         os:
-          - macos-latest
           - windows-latest
         include:
           - os: windows-latest
             TARGET_PLATFORMS: win32
-          - os: macos-latest
-            TARGET_PLATFORMS: darwin
 
     steps:
       - uses: actions/checkout@v2
@@ -33,6 +30,8 @@ jobs:
 
       - name: Package Electron
         run: |
+          npm install -g node-gyp
+          export npm_config_node_gyp=%USERPROFILE%\AppData\Roaming\npm\node_modules\node-gyp\bin\node-gyp.js
           npm i
           npm run rebuild-native
           npm run pack
