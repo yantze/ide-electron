@@ -1,14 +1,14 @@
 const os = require('os');
-const { resolve } = require('path');
+const { join } = require('path');
 const { execSync } = require('child_process');
 const { pathExistsSync, copySync, removeSync } = require('fs-extra');
 const argv = require('yargs').argv;
 
 const nativeModules = [
-  resolve(__dirname, '../node_modules/node-pty'),
-  resolve(__dirname, '../node_modules/nsfw'),
-  resolve(__dirname, '../node_modules/spdlog'),
-  resolve(__dirname, '../node_modules/keytar'),
+  join(__dirname, '../node_modules/node-pty'),
+  join(__dirname, '../node_modules/nsfw'),
+  join(__dirname, '../node_modules/spdlog'),
+  join(__dirname, '../node_modules/keytar'),
 ];
 
 let commands;
@@ -26,14 +26,14 @@ if (target === 'electron') {
   if (os.platform() === 'win32') {
     commands = [
       'set HOME=~/.electron-gyp',
-      resolve(__dirname, '..\\node_modules\\.bin\\electron-rebuild.cmd'),
+      join(__dirname, '..\\node_modules\\.bin\\electron-rebuild.cmd'),
     ];
   } else {
     commands = [
       `npm_config_arch=${arch}`,
       `npm_config_target_arch=${arch}`,
       'HOME=~/.electron-gyp',
-      resolve(__dirname, '../node_modules/.bin/electron-rebuild'),
+      join(__dirname, '../node_modules/.bin/electron-rebuild'),
     ];
   }
 } else if (target === 'node') {
@@ -47,12 +47,12 @@ if (target === 'electron') {
 }
 
 function rebuildModule(modulePath, type, version) {
-  const info = require(resolve(modulePath, './package.json'));
+  const info = require(join(modulePath, './package.json'));
   console.log('rebuilding ' + info.name)
   const cache = getBuildCacheDir(modulePath, type, version, target);
   if (pathExistsSync(cache) && !argv['force-rebuild']) {
     console.log('cache found for ' + info.name)
-    copySync(cache, resolve(modulePath, 'build'));
+    copySync(cache, join(modulePath, 'build'));
   }
   else {
     const command = commands.join(' ');
@@ -65,13 +65,13 @@ function rebuildModule(modulePath, type, version) {
       HOME: target === 'electron' ? '~/.electron-gyp' : undefined
     });
     removeSync(cache);
-    copySync(resolve(modulePath, 'build'), cache);
+    copySync(join(modulePath, 'build'), cache);
   }
 }
 
 function getBuildCacheDir(modulePath, type, version, target) {
-  const info = require(resolve(modulePath, './package.json'));
-  return resolve(require('os').tmpdir(), 'ide_build_cache', target, info.name + '-' + info.version, type + '-' + version);
+  const info = require(join(modulePath, './package.json'));
+  return join(require('os').tmpdir(), 'ide_build_cache', target, info.name + '-' + info.version, type + '-' + version);
 }
 
 
