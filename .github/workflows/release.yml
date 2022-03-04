@@ -24,7 +24,7 @@ jobs:
 
       - name: Package Electron
         run: |
-          npm i
+          npm i --ignore-scripts
           npm run rebuild-native
           npm run pack
         env:
