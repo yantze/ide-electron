@@ -54,7 +54,7 @@ function rebuildModule(modulePath, type, version) {
     copySync(cache, resolve(modulePath, 'build'));
   }
   else {
-    const command = commands.resolve(' ');
+    const command = commands.join(' ');
     console.log(command);
     execSync(command, {
       cwd: modulePath,
