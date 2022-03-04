@@ -31,7 +31,7 @@ jobs:
       - name: Package Electron
         run: |
           npm install -g node-gyp
-          export npm_config_node_gyp=%USERPROFILE%\AppData\Roaming\npm\node_modules\node-gyp\bin\node-gyp.js
+          set npm_config_node_gyp=%USERPROFILE%\AppData\Roaming\npm\node_modules\node-gyp\bin\node-gyp.js
           npm i
           npm run rebuild-native
           npm run pack
