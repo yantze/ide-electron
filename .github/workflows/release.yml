@@ -29,3 +29,12 @@ jobs:
           npm run pack
         env:
           TARGET_PLATFORMS: win32
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Release
+          path: |
+            LICENSE
+            out/*.dmg
+            out/*.exe
+          if-no-files-found: error
