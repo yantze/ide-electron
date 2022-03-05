@@ -1,46 +1,77 @@
 const os = require('os');
 const { join } = require('path');
-const { execSync, exec } = require('child_process');
+const { execSync } = require('child_process');
 const { pathExistsSync, copySync, removeSync } = require('fs-extra');
 const argv = require('yargs').argv;
 
 const nativeModules = [
-  'node-pty',
-  'nsfw',
-  'spdlog',
-  'keytar',
-];
+  join(__dirname, '../node_modules/node-pty'),
+  join(__dirname, '../node_modules/nsfw'),
+  join(__dirname, '../node_modules/spdlog')
+]
 
 let commands;
 
 const target = argv.target || 'node';
-const force = argv['force-rebuild'] === 'true';
 const arch = argv.arch || os.arch();
-const version = argv.electronVersion || require('electron/package.json').version;
+let version;
 
-console.log('rebuilding native for electron version ' + version);
+if (target === 'electron') {
 
-if (os.platform() === 'win32') {
+  version = argv.electronVersion || require('electron/package.json').version;
+
+  console.log('rebuilding native for electron version ' + version);
+
   commands = [
-    'set HOME=~/.electron-gyp',
-    join(__dirname, '..\\node_modules\\.bin\\electron-rebuild.cmd'),
+    os.platform() === 'win32'
+      ? 'set HOME=~/.electron-gyp'
+      : 'HOME=~/.electron-gyp',
+    'node-gyp',
+    'rebuild',
+    '--openssl_fips=X',
+    `--target=${version}`,
+    `--arch=${arch}`,
+    '--dist-url=https://electronjs.org/headers',
   ];
-} else {
-  commands = [
-    `npm_config_arch=${arch}`,
-    `npm_config_target_arch=${arch}`,
-    'HOME=~/.electron-gyp',
-    join(__dirname, '../node_modules/.bin/electron-rebuild'),
-  ];
+
+} else if (target === 'node') {
+
+  console.log('rebuilding native for node version ' + process.version);
+
+  version = process.version;
+
+  commands = ['node-gyp', 'rebuild']
+
 }
 
-if (force) {
-  commands.push('-f');
+function rebuildModule(modulePath, type, version) {
+  const info = require(join(modulePath, './package.json'));
+  console.log('rebuilding ' + info.name)
+  const cache = getBuildCacheDir(modulePath, type, version, target);
+  if (pathExistsSync(cache) && !argv['force-rebuild']) {
+    console.log('cache found for ' + info.name)
+    copySync(cache, join(modulePath, 'build'));
+  }
+  else {
+    const command = commands.join(' ');
+    console.log(command);
+    execSync(command, {
+      cwd: modulePath,
+      HOME: target === 'electron' ? '~/.electron-gyp' : undefined
+    });
+    console.log('rebuilding result' + execSync(`ls ${modulePath}`));
+    removeSync(cache);
+    copySync(join(modulePath, 'build'), cache);
+  }
+
 }
 
-nativeModules.forEach(moduleName => {
-  const command = `${commands.join(' ')} -w ${moduleName}`;
-  execSync(command);
-  const modulePath = join(__dirname, '../node_modules/', moduleName);
-  console.log('ls cwd >>>', execSync(`ls ${modulePath}`).toString());
-});
+function getBuildCacheDir(modulePath, type, version, target) {
+  const info = require(join(modulePath, './package.json'));
+  return join(require('os').tmpdir(), 'ide_build_cache', target, info.name + '-' + info.version, type + '-' + version);
+}
+
+
+nativeModules.forEach(path => {
+  rebuildModule(path, target, version);
+})
