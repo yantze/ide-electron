@@ -41,6 +41,6 @@ if (force) {
 nativeModules.forEach(moduleName => {
   const command = `${commands.join(' ')} ${moduleName}`;
   execSync(command);
-  const modulePath = join(__dirname, moduleName);
+  const modulePath = join(__dirname, '../node_modules/', moduleName);
   console.log('ls cwd >>>', execSync(`ls ${modulePath}`).toString());
 });
