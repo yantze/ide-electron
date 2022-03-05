@@ -23,9 +23,9 @@ if (target === 'electron') {
   console.log('rebuilding native for electron version ' + version);
 
   commands = [
-    os.platform() === 'win32'
-      ? 'set HOME=~/.electron-gyp'
-      : 'HOME=~/.electron-gyp',
+    // os.platform() === 'win32'
+    //   ? 'set HOME=~/.electron-gyp'
+    //   : 'HOME=~/.electron-gyp',
     'node-gyp',
     'rebuild',
     '--openssl_fips=X',
@@ -65,6 +65,8 @@ function rebuildModule(modulePath, type, version) {
     });
 
     console.log('rebuilding result' + execSync(`ls ${modulePath}`));
+    console.log('type node-gyp' + execSync(`type node-gyp`));
+    console.log('where node-gyp' + execSync(`where node-gyp`));
     removeSync(cache);
     copySync(join(modulePath, 'build'), cache);
   }
