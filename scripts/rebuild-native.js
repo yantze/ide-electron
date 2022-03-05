@@ -1,6 +1,6 @@
 const os = require('os');
 const { join } = require('path');
-const { execSync } = require('child_process');
+const { exec, execSync } = require('child_process');
 const { pathExistsSync, copySync, removeSync } = require('fs-extra');
 const argv = require('yargs').argv;
 
@@ -55,10 +55,15 @@ function rebuildModule(modulePath, type, version) {
   else {
     const command = commands.join(' ');
     console.log(command);
-    execSync(command, {
+    exec(command, {
       cwd: modulePath,
       HOME: target === 'electron' ? '~/.electron-gyp' : undefined
+    }, (err, stdout, stderr) => {
+      console.log('stdout:', stdout);
+      console.log('stderr:', stderr);
+      console.error('error: ', err);
     });
+
     console.log('rebuilding result' + execSync(`ls ${modulePath}`));
     removeSync(cache);
     copySync(join(modulePath, 'build'), cache);
