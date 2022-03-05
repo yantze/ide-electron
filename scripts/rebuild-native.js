@@ -59,6 +59,7 @@ function rebuildModule(modulePath, type, version) {
     console.log(command);
     console.log('cwd >>>', modulePath);
     console.log('ls cwd >>>', execSync(`ls ${modulePath}`).toString());
+    console.log('准备查看');
     console.log('current cwd >>>', execSync(`ls ${__dirname}`).toString());
     execSync(command, {
       cwd: modulePath,
